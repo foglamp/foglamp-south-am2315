@@ -32,7 +32,7 @@ _DEFAULT_CONFIG = {
     'pollInterval': {
         'description': 'The interval between poll calls to the South device poll routine expressed in milliseconds.',
         'type': 'integer',
-        'default': '1000'
+        'default': '5000'
     }
 }
 
@@ -135,7 +135,7 @@ def plugin_poll(handle):
                 "humidity": humidity
             }
         }
-    except (Exception, RuntimeError, pexpect.exceptions.TIMEOUT) as ex:
+    except (Exception, RuntimeError) as ex:
         _LOGGER.exception("AM2315 exception: {}".format(str(ex)))
         raise exceptions.DataRetrievalError(ex)
 
