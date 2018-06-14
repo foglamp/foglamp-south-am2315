@@ -12,7 +12,6 @@ import json
 import uuid
 import smbus
 
-from foglamp.plugins.south.am2315.max31865 import *
 from foglamp.common import logger
 from foglamp.plugins.common import utils
 from foglamp.services.south import exceptions
