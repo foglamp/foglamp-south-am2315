@@ -17,7 +17,7 @@ from foglamp.plugins.common import utils
 from foglamp.services.south import exceptions
 
 
-__author__ = "Ashwin Gopalakrishnan"
+__author__ = "Ashwin Gopalakrishnan, Amarendra K Sinha"
 __copyright__ = "Copyright (c) 2018 OSIsoft, LLC"
 __license__ = "Apache 2.0"
 __version__ = "${VERSION}"
@@ -28,6 +28,19 @@ _DEFAULT_CONFIG = {
          'type': 'string',
          'default': 'am2315'
     },
+    'assetPrefix': {
+        'description': 'Asset prefix',
+        'type': 'string',
+        'default': 'am2315_%M_',
+        'order': '2'
+    },
+    'i2cAddress': {
+        'description': 'I2C address in hex',
+        'type': 'string',
+        'default': '0x5C',
+        'order': '1'
+    },
+
     'pollInterval': {
         'description': 'The interval between poll calls to the South device poll routine expressed in milliseconds.',
         'type': 'integer',
@@ -87,12 +100,15 @@ def plugin_poll(handle):
         DataRetrievalError
     """
     bus = handle["bus"]
-    sensor_add      = 0x5C
+    i2c_address = handle['i2cAddress']['value']
+
+    sensor_add      = hex(int(i2c_address, 16))
     start_add       = 0x00
     function_code   = 0x03
     register_number = 0x04
     response_bytes = 8
     attempt_threshold = 50
+    asset_prefix = '{}'.format(handle['assetPrefix']['value']).replace('%M', i2c_address)
 
     try:
 
@@ -126,7 +142,7 @@ def plugin_poll(handle):
             pass
         time_stamp = str(datetime.datetime.now(tz=datetime.timezone.utc))
         data = {
-            'asset': 'am2315',
+            'asset': asset_prefix,
             'timestamp': time_stamp,
             'key': str(uuid.uuid4()),
             'readings': {
@@ -138,7 +154,6 @@ def plugin_poll(handle):
         _LOGGER.exception("AM2315 exception: {}".format(str(ex)))
         raise exceptions.DataRetrievalError(ex)
 
-    _LOGGER.debug("AM2315 reading: {}".format(json.dumps(data)))
     return data
 
 
@@ -161,11 +176,11 @@ def plugin_reconfigure(handle, new_config):
     diff = utils.get_diff(handle, new_config)
 
     # Plugin should re-initialize and restart if key configuration is changed
-    if 'pollInterval' in diff:
+    if 'pollInterval' in diff or 'i2cAddress' in diff:
         new_handle = copy.deepcopy(new_config)
-        new_handle['restart'] = 'no'
+        new_handle['restart'] = 'yes'
     else:
-        new_handle = copy.deepcopy(handle)
+        new_handle = copy.deepcopy(new_config)
         new_handle['restart'] = 'no'
     return new_handle
 
