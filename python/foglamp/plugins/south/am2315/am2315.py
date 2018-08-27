@@ -26,19 +26,20 @@ _DEFAULT_CONFIG = {
     'plugin': {
          'description': 'AM2315 Poll Plugin',
          'type': 'string',
-         'default': 'am2315'
+         'default': 'am2315',
+         'readonly': 'true'
     },
     'assetPrefix': {
         'description': 'Asset prefix',
         'type': 'string',
         'default': 'am2315_%M_',
-        'order': '2'
+        'order': '1'
     },
     'i2cAddress': {
         'description': 'I2C address in hex',
         'type': 'string',
         'default': '0x5C',
-        'order': '1'
+        'order': '2'
     },
 
     'pollInterval': {
@@ -185,17 +186,6 @@ def plugin_reconfigure(handle, new_config):
     return new_handle
 
 
-def _plugin_stop(handle):
-    """ Stops the plugin doing required cleanup, to be called prior to the South device service being shut down.
-
-    Args:
-        handle: handle returned by the plugin initialisation call
-    Returns:
-    Raises:
-    """
-    _LOGGER.info('AM2315 poll plugin stop.')
-
-
 def plugin_shutdown(handle):
     """ Shutdowns the plugin doing required cleanup, to be called prior to the South device service being shut down.
 
@@ -204,5 +194,4 @@ def plugin_shutdown(handle):
     Returns:
     Raises:
     """
-    _plugin_stop(handle)
     _LOGGER.info('AM2315 poll plugin shut down.')
