@@ -29,7 +29,7 @@ _DEFAULT_CONFIG = {
          'default': 'am2315',
          'readonly': 'true'
     },
-    'assetPrefix': {
+    'assetNamePrefix': {
         'description': 'Asset prefix',
         'type': 'string',
         'default': 'am2315_%M_',
@@ -45,8 +45,9 @@ _DEFAULT_CONFIG = {
     'pollInterval': {
         'description': 'The interval between poll calls to the South device poll routine expressed in milliseconds.',
         'type': 'integer',
-        'default': '5000'
-    }
+        'default': '5000',
+        'order': '2'
+}
 }
 
 _LOGGER = logger.setup(__name__, level=20)
@@ -109,7 +110,7 @@ def plugin_poll(handle):
     register_number = 0x04
     response_bytes = 8
     attempt_threshold = 50
-    asset_prefix = '{}'.format(handle['assetPrefix']['value']).replace('%M', i2c_address)
+    asset_prefix = '{}'.format(handle['assetNamePrefix']['value']).replace('%M', i2c_address)
 
     try:
 
@@ -178,7 +179,8 @@ def plugin_reconfigure(handle, new_config):
 
     # Plugin should re-initialize and restart if key configuration is changed
     if 'pollInterval' in diff or 'i2cAddress' in diff:
-        new_handle = copy.deepcopy(new_config)
+        plugin_shutdown()
+        new_handle = plugin_init(new_config)
         new_handle['restart'] = 'yes'
     else:
         new_handle = copy.deepcopy(new_config)
