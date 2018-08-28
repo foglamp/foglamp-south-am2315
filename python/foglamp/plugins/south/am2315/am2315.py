@@ -32,7 +32,7 @@ _DEFAULT_CONFIG = {
     'assetNamePrefix': {
         'description': 'Asset prefix',
         'type': 'string',
-        'default': 'am2315_%M_',
+        'default': 'am2315/%M/',
         'order': '1'
     },
     'i2cAddress': {
