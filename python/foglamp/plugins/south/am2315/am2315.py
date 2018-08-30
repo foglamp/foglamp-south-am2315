@@ -29,8 +29,8 @@ _DEFAULT_CONFIG = {
          'default': 'am2315',
          'readonly': 'true'
     },
-    'assetNamePrefix': {
-        'description': 'Asset prefix',
+    'assetName': {
+        'description': 'Asset name',
         'type': 'string',
         'default': 'am2315/%M/',
         'order': '1'
@@ -110,7 +110,7 @@ def plugin_poll(handle):
     register_number = 0x04
     response_bytes = 8
     attempt_threshold = 50
-    asset_prefix = '{}'.format(handle['assetNamePrefix']['value']).replace('%M', i2c_address)
+    asset_name = '{}'.format(handle['assetName']['value']).replace('%M', i2c_address)
 
     try:
 
@@ -144,7 +144,7 @@ def plugin_poll(handle):
             pass
         time_stamp = str(datetime.datetime.now(tz=datetime.timezone.utc))
         data = {
-            'asset': asset_prefix,
+            'asset': asset_name,
             'timestamp': time_stamp,
             'key': str(uuid.uuid4()),
             'readings': {
