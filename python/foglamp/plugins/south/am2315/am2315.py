@@ -156,17 +156,8 @@ def plugin_reconfigure(handle, new_config):
     Raises:
     """
     _LOGGER.info("Old config for AM2315 plugin {} \n new config {}".format(handle, new_config))
-
-    # Find diff between old config and new config
-    diff = utils.get_diff(handle, new_config)
-
-    # Plugin should re-initialize and restart if key configuration is changed
-    if 'pollInterval' in diff:
-        new_handle = copy.deepcopy(new_config)
-        new_handle['restart'] = 'no'
-    else:
-        new_handle = copy.deepcopy(handle)
-        new_handle['restart'] = 'no'
+    new_handle = copy.deepcopy(new_config)
+    new_handle['restart'] = 'no'
     return new_handle
 
 
