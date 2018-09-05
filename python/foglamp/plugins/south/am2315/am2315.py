@@ -8,8 +8,9 @@
 
 import copy
 import datetime
-import json
 import uuid
+import logging
+
 import smbus
 
 from foglamp.common import logger
@@ -46,11 +47,12 @@ _DEFAULT_CONFIG = {
         'description': 'The interval between poll calls to the South device poll routine expressed in milliseconds.',
         'type': 'integer',
         'default': '5000',
-        'order': '2'
+        'order': '2',
+        'minimum': 1000
 }
 }
 
-_LOGGER = logger.setup(__name__, level=20)
+_LOGGER = logger.setup(__name__, level=logging.INFO)
 
 
 def plugin_info():
@@ -142,7 +144,7 @@ def plugin_poll(handle):
                     calc_crc = calc_crc >> 1
         if calc_crc != crc:
             pass
-        time_stamp = str(datetime.datetime.now(tz=datetime.timezone.utc))
+        time_stamp = utils.local_timestamp()
         data = {
             'asset': asset_name,
             'timestamp': time_stamp,
