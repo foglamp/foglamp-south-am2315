@@ -48,7 +48,7 @@ _DEFAULT_CONFIG = {
         'type': 'integer',
         'default': '5000',
         'order': '2',
-        'minimum': 1000
+        'minimum': '1000'
 }
 }
 
