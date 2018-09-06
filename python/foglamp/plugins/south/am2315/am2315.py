@@ -103,18 +103,17 @@ def plugin_poll(handle):
     Raises:
         DataRetrievalError
     """
-    bus = handle["bus"]
-    i2c_address = handle['i2cAddress']['value']
-
-    sensor_add      = hex(int(i2c_address, 16))
-    start_add       = 0x00
-    function_code   = 0x03
-    register_number = 0x04
-    response_bytes = 8
-    attempt_threshold = 50
-    asset_name = '{}'.format(handle['assetName']['value']).replace('%M', i2c_address)
-
     try:
+        bus = handle["bus"]
+        i2c_address = handle['i2cAddress']['value']
+
+        sensor_add = hex(int(i2c_address, 16))
+        start_add = 0x00
+        function_code = 0x03
+        register_number = 0x04
+        response_bytes = 8
+        attempt_threshold = 50
+        asset_name = '{}'.format(handle['assetName']['value']).replace('%M', i2c_address)
 
         try:
             # wake up call
