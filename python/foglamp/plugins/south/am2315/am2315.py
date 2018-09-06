@@ -8,8 +8,9 @@
 
 import copy
 import datetime
-import json
 import uuid
+import logging
+
 import smbus
 
 from foglamp.common import logger
@@ -17,7 +18,7 @@ from foglamp.plugins.common import utils
 from foglamp.services.south import exceptions
 
 
-__author__ = "Ashwin Gopalakrishnan"
+__author__ = "Ashwin Gopalakrishnan, Amarendra K Sinha"
 __copyright__ = "Copyright (c) 2018 OSIsoft, LLC"
 __license__ = "Apache 2.0"
 __version__ = "${VERSION}"
@@ -26,16 +27,32 @@ _DEFAULT_CONFIG = {
     'plugin': {
          'description': 'AM2315 Poll Plugin',
          'type': 'string',
-         'default': 'am2315'
+         'default': 'am2315',
+         'readonly': 'true'
     },
+    'assetName': {
+        'description': 'Asset name',
+        'type': 'string',
+        'default': 'am2315/%M/',
+        'order': '1'
+    },
+    'i2cAddress': {
+        'description': 'I2C address in hex',
+        'type': 'string',
+        'default': '0x5C',
+        'order': '2'
+    },
+
     'pollInterval': {
         'description': 'The interval between poll calls to the South device poll routine expressed in milliseconds.',
         'type': 'integer',
-        'default': '5000'
-    }
+        'default': '5000',
+        'order': '2',
+        'minimum': '1000'
+}
 }
 
-_LOGGER = logger.setup(__name__, level=20)
+_LOGGER = logger.setup(__name__, level=logging.INFO)
 
 
 def plugin_info():
@@ -86,15 +103,17 @@ def plugin_poll(handle):
     Raises:
         DataRetrievalError
     """
-    bus = handle["bus"]
-    sensor_add      = 0x5C
-    start_add       = 0x00
-    function_code   = 0x03
-    register_number = 0x04
-    response_bytes = 8
-    attempt_threshold = 50
-
     try:
+        bus = handle["bus"]
+        i2c_address = handle['i2cAddress']['value']
+
+        sensor_add = hex(int(i2c_address, 16))
+        start_add = 0x00
+        function_code = 0x03
+        register_number = 0x04
+        response_bytes = 8
+        attempt_threshold = 50
+        asset_name = '{}'.format(handle['assetName']['value']).replace('%M', i2c_address)
 
         try:
             # wake up call
@@ -124,9 +143,9 @@ def plugin_poll(handle):
                     calc_crc = calc_crc >> 1
         if calc_crc != crc:
             pass
-        time_stamp = str(datetime.datetime.now(tz=datetime.timezone.utc))
+        time_stamp = utils.local_timestamp()
         data = {
-            'asset': 'am2315',
+            'asset': asset_name,
             'timestamp': time_stamp,
             'key': str(uuid.uuid4()),
             'readings': {
@@ -138,7 +157,6 @@ def plugin_poll(handle):
         _LOGGER.exception("AM2315 exception: {}".format(str(ex)))
         raise exceptions.DataRetrievalError(ex)
 
-    _LOGGER.debug("AM2315 reading: {}".format(json.dumps(data)))
     return data
 
 
@@ -156,29 +174,9 @@ def plugin_reconfigure(handle, new_config):
     Raises:
     """
     _LOGGER.info("Old config for AM2315 plugin {} \n new config {}".format(handle, new_config))
-
-    # Find diff between old config and new config
-    diff = utils.get_diff(handle, new_config)
-
-    # Plugin should re-initialize and restart if key configuration is changed
-    if 'pollInterval' in diff:
-        new_handle = copy.deepcopy(new_config)
-        new_handle['restart'] = 'no'
-    else:
-        new_handle = copy.deepcopy(handle)
-        new_handle['restart'] = 'no'
+    new_handle = copy.deepcopy(new_config)
+    new_handle['restart'] = 'no'
     return new_handle
-
-
-def _plugin_stop(handle):
-    """ Stops the plugin doing required cleanup, to be called prior to the South device service being shut down.
-
-    Args:
-        handle: handle returned by the plugin initialisation call
-    Returns:
-    Raises:
-    """
-    _LOGGER.info('AM2315 poll plugin stop.')
 
 
 def plugin_shutdown(handle):
@@ -189,5 +187,4 @@ def plugin_shutdown(handle):
     Returns:
     Raises:
     """
-    _plugin_stop(handle)
     _LOGGER.info('AM2315 poll plugin shut down.')
