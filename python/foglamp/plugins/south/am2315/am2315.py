@@ -31,25 +31,27 @@ _DEFAULT_CONFIG = {
          'readonly': 'true'
     },
     'assetName': {
-        'description': 'Asset name',
+        'description': 'Asset name, %M will be replaced by I2C address',
         'type': 'string',
         'default': 'am2315/%M/',
-        'order': '1'
+        'order': '1',
+        'displayName': 'Asset Name'
     },
     'i2cAddress': {
         'description': 'I2C address in hex',
         'type': 'string',
         'default': '0x5C',
-        'order': '2'
+        'order': '2',
+        'displayName': 'I2C Address'
     },
-
     'pollInterval': {
         'description': 'The interval between poll calls to the South device poll routine expressed in milliseconds.',
         'type': 'integer',
         'default': '5000',
-        'order': '2',
-        'minimum': '1000'
-}
+        'minimum': '1000',
+        'order': '3',
+        'displayName': 'Poll Interval'
+    }
 }
 
 _LOGGER = logger.setup(__name__, level=logging.INFO)
