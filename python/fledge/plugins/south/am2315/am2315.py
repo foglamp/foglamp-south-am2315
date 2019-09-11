@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# FOGLAMP_BEGIN
-# See: http://foglamp.readthedocs.io/
-# FOGLAMP_END
+# FLEDGE_BEGIN
+# See: http://fledge.readthedocs.io/
+# FLEDGE_END
 
 """ Module for AM2315 'poll' type plugin """
 
@@ -13,9 +13,9 @@ import logging
 
 import smbus
 
-from foglamp.common import logger
-from foglamp.plugins.common import utils
-from foglamp.services.south import exceptions
+from fledge.common import logger
+from fledge.plugins.common import utils
+from fledge.services.south import exceptions
 
 
 __author__ = "Ashwin Gopalakrishnan, Amarendra K Sinha"

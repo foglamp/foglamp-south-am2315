@@ -1,5 +1,5 @@
 ====================
-foglamp-south-am2315
+fledge-south-am2315
 ====================
 
 South Plugin for Raspberry PI AM2315
