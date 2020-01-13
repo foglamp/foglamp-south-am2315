@@ -8,7 +8,6 @@
 
 import copy
 import datetime
-import uuid
 import logging
 
 import smbus
@@ -141,7 +140,6 @@ def plugin_poll(handle):
         data = {
             'asset': asset_name,
             'timestamp': time_stamp,
-            'key': str(uuid.uuid4()),
             'readings': {
                 "temperature": temperature,
                 "humidity": humidity
